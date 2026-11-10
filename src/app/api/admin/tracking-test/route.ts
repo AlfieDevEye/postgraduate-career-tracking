@@ -26,11 +26,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  let adminEmail: string | undefined;
   try {
     const access = await requireAdmin(request);
     if ("error" in access) return access.error;
-    adminEmail = access.adminEmail;
+    const adminEmail = access.adminEmail;
+    if (!adminEmail) return NextResponse.json({ error: "Administrator email is required." }, { status: 400 });
     const body = await request.json() as { trackingId?: string; frequencyMonths?: number; mode?: string };
     const { trackingId, frequencyMonths, mode } = body;
     if (!trackingId || ![3, 6, 9].includes(Number(frequencyMonths)) || !["simulate", "send"].includes(String(mode))) {
