@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { InstitutionHeader, SiteFooter } from "@/components/institution-header";
+import { SiteNav } from "@/components/site-nav";
 
 const programmes = [
   { title: "Postgraduate Diploma", detail: "Build specialist knowledge and prepare for the next stage of your career.", mark: "PGD" },
@@ -8,22 +9,14 @@ const programmes = [
 ];
 
 const steps = [
-  { number: "01", title: "Create your profile", body: "Share your postgraduate programme, skills and current employment information." },
-  { number: "02", title: "Keep your details current", body: "Respond to periodic requests to confirm or update your employment information." },
-  { number: "03", title: "Stay connected", body: "Help the College understand graduate career progression over time." },
+  { number: "01", title: "Create your profile", body: "Share your programme, skills and current employment information." },
+  { number: "02", title: "Complete registration", body: "Finish a few short steps and receive a confirmation." },
+  { number: "03", title: "Stay in touch", body: "The College sends a short check-in email every few months. No reply is needed." },
 ];
 
 export default function Home() {
-  return <main id="main-content" className="overflow-hidden text-slate-900">
-    <InstitutionHeader>
-      <nav aria-label="Main navigation" className="flex items-center gap-6">
-        <Link href="#programmes" className="rounded-md px-1 py-2 text-sm font-semibold text-slate-600 hover:text-teal-800">Programmes</Link>
-        <Link href="#how-it-works" className="rounded-md px-1 py-2 text-sm font-semibold text-slate-600 hover:text-teal-800">How it works</Link>
-        <Link href="#about" className="rounded-md px-1 py-2 text-sm font-semibold text-slate-600 hover:text-teal-800">About</Link>
-      </nav>
-      <Link href="/login" className="button-secondary">Student login</Link>
-      <Link href="/register" className="button-primary !min-h-10 !px-3 !py-2 text-xs sm:!px-4 sm:text-sm">Register <span aria-hidden="true">↗</span></Link>
-    </InstitutionHeader>
+  return <main id="main-content" className="overflow-x-clip text-slate-900">
+    <InstitutionHeader><SiteNav /></InstitutionHeader>
     <section className="home-hero relative isolate overflow-hidden pb-16 pt-16 sm:pb-24 sm:pt-24 lg:pt-28">
       <div className="ambient-grid" aria-hidden="true" />
       <div className="page-wrap relative grid items-center gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-16">
@@ -92,7 +85,7 @@ export default function Home() {
       <div className="page-wrap">
         <div className="surface-card overflow-hidden p-6 sm:p-10 lg:p-12">
           <div className="grid gap-10 lg:grid-cols-[.78fr_1.22fr] lg:gap-16">
-            <div><p className="section-kicker">A straightforward process</p><h2 className="mt-3 text-3xl font-semibold tracking-tight text-[#122b55] sm:text-4xl">Keep your career story up to date.</h2><p className="mt-4 text-sm leading-7 text-slate-600">Your updates help maintain a record of graduate employment and professional progress over time.</p></div>
+            <div><p className="section-kicker">How it works</p><h2 className="mt-3 text-3xl text-[#122b55] sm:text-4xl">Register once, then stay in touch.</h2><p className="mt-4 text-sm leading-7 text-slate-600">Your profile helps the College keep track of postgraduate alumni.</p><Link href="/how-it-works" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-teal-800 underline underline-offset-4">See the full process <span aria-hidden="true">{"\u2192"}</span></Link></div>
             <div className="divide-y divide-slate-200/80">
               {steps.map((step) => <article key={step.number} className="group grid gap-3 py-5 first:pt-0 last:pb-0 sm:grid-cols-[3.25rem_1fr] sm:gap-5">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-50 text-xs font-extrabold text-teal-800 ring-1 ring-teal-800/10 transition group-hover:bg-teal-700 group-hover:text-white">{step.number}</span>
@@ -101,13 +94,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section id="about" className="home-section pb-16 pt-4 sm:pb-20">
-      <div className="page-wrap grid gap-8 md:grid-cols-2">
-        <article className="rounded-[1.5rem] bg-[#10284e] p-7 text-white shadow-[0_22px_52px_rgba(16,40,78,.16)] sm:p-9"><p className="text-xs font-bold uppercase tracking-[.16em] text-teal-200">For graduates</p><h2 className="mt-4 text-2xl font-semibold tracking-tight">A simple way to keep your profile current.</h2><p className="mt-3 text-sm leading-7 text-blue-100">Share changes in your employment and career information with the College as your professional journey evolves.</p><Link href="/register" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-white underline decoration-teal-300 underline-offset-4 hover:text-teal-100">Start your registration <span aria-hidden="true">→</span></Link></article>
-        <article className="surface-card p-7 sm:p-9"><p className="section-kicker">For the College</p><h2 className="mt-4 text-2xl font-semibold tracking-tight text-[#122b55]">Stay connected with graduate outcomes.</h2><p className="mt-3 text-sm leading-7 text-slate-600">A structured record of postgraduate career updates supports the College’s ongoing understanding of alumni employment and progression.</p><div className="mt-6 flex items-center gap-3 border-t border-slate-200 pt-5"><span className="grid h-9 w-9 place-items-center rounded-xl bg-amber-50 text-[#8b6a22]">◆</span><p className="text-xs font-medium leading-5 text-slate-600">Built around postgraduate profiles and periodic employment updates.</p></div></article>
       </div>
     </section>
 
