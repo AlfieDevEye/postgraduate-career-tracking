@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function InstitutionHeader({ children, brandTitle = "College of Postgraduate Studies" }: { children?: React.ReactNode; brandTitle?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -41,18 +42,18 @@ export function InstitutionHeader({ children, brandTitle = "College of Postgradu
         <Image src="/logo.png" alt="Redeemers University logo" width={68} height={68} className="brand-mark" priority />
         <span className="min-w-0"><span className="brand-eyebrow">Redeemers University</span><span className="brand-title">{brandTitle}</span></span>
       </Link>
-      {children && <div className="header-desktop-actions flex shrink-0 items-center gap-2 sm:gap-3">{children}</div>}
-      {children && <button
-        ref={menuButtonRef}
-        type="button"
-        className="header-menu-toggle button-secondary"
-        aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-        aria-expanded={menuOpen}
-        aria-controls="institution-mobile-nav"
-        onClick={() => setMenuOpen((open) => !open)}
-      >
-        <span aria-hidden="true" className="menu-icon"><span /><span /><span /></span>
-      </button>}
+      {children && <div className="header-desktop-actions flex shrink-0 items-center gap-2 sm:gap-3"><ThemeToggle />{children}</div>}
+      {children && <div className="header-mobile-controls"><ThemeToggle /><button
+          ref={menuButtonRef}
+          type="button"
+          className="header-menu-toggle button-secondary"
+          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={menuOpen}
+          aria-controls="institution-mobile-nav"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <span aria-hidden="true" className="menu-icon"><span /><span /><span /></span>
+        </button></div>}
     </div>
     {children && <div
       ref={menuRef}
@@ -68,10 +69,14 @@ export function InstitutionHeader({ children, brandTitle = "College of Postgradu
 }
 
 export function SiteFooter() {
-  return <footer className="site-footer border-t border-slate-200/80 bg-white/60">
+  return <footer className="site-footer border-t border-slate-200/80 bg-card/60">
     <div className="page-wrap flex flex-col gap-2 py-7 text-xs leading-5 text-slate-500 sm:flex-row sm:items-center sm:justify-between">
       <p>(c) {new Date().getFullYear()} Redeemers University | College of Postgraduate Studies</p>
       <p>Postgraduate Career Tracking System</p>
+      <nav aria-label="Footer" className="flex gap-4">
+        <Link href="/privacy" className="underline underline-offset-4 hover:text-teal-800">Privacy</Link>
+        <Link href="/contact" className="underline underline-offset-4 hover:text-teal-800">Contact</Link>
+      </nav>
     </div>
   </footer>;
 }

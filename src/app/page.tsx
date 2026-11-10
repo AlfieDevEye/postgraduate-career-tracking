@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { InstitutionHeader, SiteFooter } from "@/components/institution-header";
 import { SiteNav } from "@/components/site-nav";
@@ -17,47 +18,20 @@ const steps = [
 export default function Home() {
   return <main id="main-content" className="overflow-x-clip text-slate-900">
     <InstitutionHeader><SiteNav /></InstitutionHeader>
-    <section className="home-hero relative isolate overflow-hidden pb-16 pt-16 sm:pb-24 sm:pt-24 lg:pt-28">
-      <div className="ambient-grid" aria-hidden="true" />
-      <div className="page-wrap relative grid items-center gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-16">
+    <section className="home-hero relative isolate flex items-center overflow-hidden">
+      <Image src="/hero.jpeg" alt="" fill priority sizes="100vw" className="-z-20 object-cover [object-position:50%_45%]" />
+      <div className="absolute inset-0 -z-10 bg-[#0b1c38]/70 lg:hidden" aria-hidden="true" />
+      <div className="absolute inset-0 -z-10 hidden bg-gradient-to-r from-[#0b1c38]/90 via-[#0b1c38]/60 to-[#0b1c38]/10 lg:block" aria-hidden="true" />
+      <div className="page-wrap relative py-16 sm:py-20">
         <div className="soft-rise max-w-2xl">
-          <span className="eyebrow-pill"><span className="h-2 w-2 rounded-full bg-teal-700" /> Postgraduate Career Tracking</span>
-          <h1 className="mt-6 text-[2.65rem] font-semibold leading-[1.08] tracking-[-.05em] text-gradient sm:text-6xl lg:text-[4.25rem]">
-            Postgraduate career records in one place.
-          </h1>
-          <p className="mt-6 max-w-xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
-            Record your programme, skills and employment details for Redeemers University College of Postgraduate Studies.
-          </p>
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[.08em] text-[#f2c56b]">Postgraduate Career Tracking</span>
+          <h1 className="mt-6 text-[2.5rem] text-white sm:text-5xl lg:text-[3.5rem]">Postgraduate career records in one place.</h1>
+          <p className="mt-6 max-w-xl text-base leading-7 text-white/90 sm:text-lg sm:leading-8">Record your programme, skills and employment details for Redeemers University College of Postgraduate Studies.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link href="/register" className="button-primary">Create your profile <span aria-hidden="true">→</span></Link>
-            <Link href="/login" className="button-secondary">Student login</Link>
+            <Link href="/register" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#e0a63a] px-6 py-3 text-sm font-bold text-[#0b1c38] hover:bg-[#f0b84d]">Create your profile <span aria-hidden="true">{"\u2192"}</span></Link>
+            <Link href="/login" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/60 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur hover:bg-white/20">Student login</Link>
           </div>
-          <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-slate-500">
-            <span className="inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-teal-700" />For postgraduate students and graduates</span>
-            <span className="hidden h-4 w-px bg-slate-300 sm:block" />
-            <span>Redeemers University</span>
-          </div>
-        </div>
-
-        <div className="relative mx-auto w-full max-w-[34rem] soft-rise [animation-delay:120ms]" aria-hidden="true">
-          <div className="relative aspect-[1.08/1] overflow-hidden rounded-[2rem] border border-slate-200 bg-[#edf3f6] shadow-[0_20px_48px_rgba(17,44,78,.10)]">
-            <div className="absolute left-[12%] top-[14%] h-[72%] w-[76%] rounded-[48%] border border-teal-800/10" />
-            <div className="absolute left-[20%] top-[21%] h-[58%] w-[60%] rounded-[48%] border border-teal-800/10" />
-            <div className="absolute left-[29%] top-[29%] h-[42%] w-[42%] rounded-[48%] border border-teal-800/15" />
-            <div className="absolute left-1/2 top-[47%] grid h-36 w-36 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[2.4rem] border border-white bg-white shadow-[0_16px_36px_rgba(15,45,77,.10)] sm:h-44 sm:w-44">
-              <div className="grid h-24 w-24 place-items-center rounded-[1.8rem] bg-gradient-to-br from-[#17365f] to-[#147d82] shadow-lg sm:h-28 sm:w-28">
-                <div className="text-center text-white"><span className="block text-3xl font-semibold tracking-tight sm:text-4xl">RU</span><span className="mt-1 block text-[9px] font-bold uppercase tracking-[.2em] text-teal-100">Career path</span></div>
-              </div>
-            </div>
-            <div className="absolute bottom-[9%] left-[8%] rounded-2xl border border-white/90 bg-white/85 px-4 py-3 shadow-lg backdrop-blur">
-              <span className="block text-[10px] font-bold uppercase tracking-[.15em] text-teal-800">Learning</span><span className="mt-1 block text-sm font-semibold text-slate-800">Postgraduate study</span>
-            </div>
-            <div className="absolute right-[8%] top-[10%] rounded-2xl border border-white/90 bg-white/85 px-4 py-3 shadow-lg backdrop-blur">
-              <span className="block text-[10px] font-bold uppercase tracking-[.15em] text-blue-800">Progress</span><span className="mt-1 block text-sm font-semibold text-slate-800">Career development</span>
-            </div>
-            <div className="absolute bottom-[13%] right-[8%] h-3 w-3 rounded-full bg-[#c6a04a] shadow-[0_0_0_8px_rgba(198,160,74,.14)]" />
-            <div className="absolute left-[11%] top-[43%] h-2 w-2 rounded-full bg-teal-700 shadow-[0_0_0_7px_rgba(20,125,130,.12)]" />
-          </div>
+          <p className="mt-8 text-xs font-medium text-white/80">For postgraduate students and graduates {"\u00b7"} Redeemers University</p>
         </div>
       </div>
     </section>
@@ -97,9 +71,9 @@ export default function Home() {
       </div>
     </section>
 
-    <section className="home-cta relative overflow-hidden bg-gradient-to-r from-[#0b1c38] via-[#122b55] to-[#147d82] py-16 text-white sm:py-20">
+    <section className="home-cta relative overflow-hidden bg-[#0b1c38] py-16 text-white sm:py-20">
       <div className="absolute inset-0 opacity-30" aria-hidden="true"><div className="absolute -right-20 -top-36 h-80 w-80 rounded-full border border-white/30"/><div className="absolute -right-4 -top-20 h-52 w-52 rounded-full border border-white/20"/></div>
-      <div className="page-wrap relative flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center"><div><p className="text-xs font-bold uppercase tracking-[.16em] text-teal-200">Career records</p><h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">Update your postgraduate profile.</h2><p className="mt-3 max-w-xl text-sm leading-6 text-blue-100">Register to record your programme and employment information.</p></div><Link href="/register" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#10284e] shadow-lg transition hover:-translate-y-0.5 hover:bg-teal-50">Register as a student <span className="ml-2" aria-hidden="true">→</span></Link></div>
+      <div className="page-wrap relative flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center"><div><p className="text-xs font-bold uppercase tracking-[.16em] text-[#f2c56b]">Career records</p><h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">Update your postgraduate profile.</h2><p className="mt-3 max-w-xl text-sm leading-6 text-blue-100">Register to record your programme and employment information.</p></div><Link href="/register" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#e0a63a] px-5 py-3 text-sm font-bold text-[#0b1c38] shadow-lg transition hover:-translate-y-0.5 hover:bg-[#f0b84d]">Register as a student <span className="ml-2" aria-hidden="true">→</span></Link></div>
     </section>
     <SiteFooter />
   </main>;

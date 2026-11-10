@@ -39,7 +39,7 @@ export default function VerifyEmailPage() {
     setVerified(isVerified);
     setChecking(false);
     if (!isVerified) setMessage("We have sent a verification link to your email address. Please check your inbox and click the link to verify your account. Registration continues after verification.");
-    else setMessage("Your email is verified. Continue to the Academic Information step to complete your registration.");
+    else setMessage("Your email is verified. Continue to complete your registration.");
   }
 
   async function resend() {
@@ -69,7 +69,7 @@ export default function VerifyEmailPage() {
             <button type="button" disabled={busy} onClick={() => void resend()} className="button-secondary disabled:opacity-60">{busy ? "Sending…" : "Resend email"}</button>
           </>}
         </div>
-        <p className="mt-6 border-t border-slate-200 pt-5 text-xs leading-6 text-slate-500">After verification, return here and check your status. Your registration will continue from Academic Information.</p>
+        <p className="mt-6 border-t border-slate-200 pt-5 text-xs leading-6 text-slate-500">After verification, return here and check your status. Your registration will then continue with your personal details.</p>
       </section>
     </div>
     <SiteFooter />

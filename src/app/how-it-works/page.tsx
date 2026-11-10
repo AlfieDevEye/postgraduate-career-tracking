@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingPage } from "@/components/marketing-page";
 export const metadata: Metadata = {
-  title: "How it works | Redeemers University Postgraduate Career Tracking",
+  title: "How it works",
   description: "How alumni register and receive check-in emails.",
 };
 const steps = [
