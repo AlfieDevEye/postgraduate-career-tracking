@@ -7,6 +7,7 @@ import { InstitutionHeader, SiteFooter } from "@/components/institution-header";
 import { getStudentRegistration, registrationResumeStep, type StudentRegistration } from "@/lib/student-registration";
 import { PROGRAMME_DURATION_YEARS } from "@/lib/student-dashboard-config";
 import { supabase } from "@/lib/supabase";
+import { Toast } from "@/components/toast";
 
 type Opportunity = { id: string; title: string; employer: string; location: string | null; description: string | null; application_url: string | null; closes_at: string | null };
 const section = "surface-card rounded-2xl p-5 sm:p-7";
@@ -19,6 +20,15 @@ export default function DashboardPage() {
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState("");
   const [opportunityError, setOpportunityError] = useState("");
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("registered") === "1") {
+      setNotice("Your registration has been saved successfully.");
+      window.history.replaceState(null, "", "/dashboard");
+    }
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -49,6 +59,7 @@ export default function DashboardPage() {
   async function signOut() { await supabase.auth.signOut(); router.push("/login"); }
 
   return <main id="main-content" className="min-h-screen text-slate-900">
+    <Toast message={notice} onClose={() => setNotice("")} />
     <InstitutionHeader><button type="button" onClick={() => void signOut()} className="button-secondary">Sign out</button></InstitutionHeader>
     <div className="page-wrap-narrow space-y-6 py-10">
       <section className={section}>
