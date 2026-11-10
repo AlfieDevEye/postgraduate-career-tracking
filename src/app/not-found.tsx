@@ -1,17 +1,17 @@
 import Link from "next/link";
-import { InstitutionHeader, SiteFooter } from "@/components/institution-header";
+import { MarketingPage } from "@/components/marketing-page";
 
 export default function NotFound() {
-  return <main id="main-content" className="min-h-screen text-slate-900">
-    <InstitutionHeader><Link href="/register" className="button-primary !min-h-10 !px-3 !py-2 text-xs sm:text-sm">Register</Link></InstitutionHeader>
-    <div className="page-wrap-narrow grid min-h-[70vh] place-items-center py-14 text-center">
-      <section className="surface-card w-full p-8 sm:p-12">
-        <span className="eyebrow-pill">Page not found</span>
-        <h1 className="mt-5 text-4xl font-semibold tracking-tight text-gradient">This page isn’t here.</h1>
-        <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-slate-600">The address may have changed, or the page may no longer be available.</p>
-        <Link href="/" className="button-primary mt-7">Return to the homepage <span aria-hidden="true">→</span></Link>
-      </section>
-    </div>
-    <SiteFooter />
-  </main>;
+  return <MarketingPage>
+    <section className="page-wrap grid min-h-[70vh] place-items-center py-14 text-center">
+      <div className="surface-card w-full max-w-2xl rounded-2xl p-8 sm:p-12">
+        <h1 className="text-4xl text-[#122b55] sm:text-5xl">Page not found</h1>
+        <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-slate-600">The page you are looking for could not be found.</p>
+        <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+          <Link href="/" className="button-primary">Go to home page</Link>
+          <Link href="/contact" className="button-secondary">Contact</Link>
+        </div>
+      </div>
+    </section>
+  </MarketingPage>;
 }

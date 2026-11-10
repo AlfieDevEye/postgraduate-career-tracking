@@ -2,15 +2,25 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InstitutionHeader, SiteFooter } from "@/components/institution-header";
 import { getStudentRegistration, registrationResumeStep } from "@/lib/student-registration";
 import { supabase } from "@/lib/supabase";
+import { Toast } from "@/components/toast";
 
 export default function StudentLoginPage() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const message = params.get("signedOut") === "1" ? "Signed out." : params.get("passwordUpdated") === "1" ? "Your password has been updated." : "";
+    const timer = message ? window.setTimeout(() => setNotice(message), 0) : undefined;
+    window.history.replaceState(null, "", "/login");
+    return () => { if (timer !== undefined) window.clearTimeout(timer); };
+  }, []);
 
   async function signIn(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,7 +43,7 @@ export default function StudentLoginPage() {
     try {
       const record = await getStudentRegistration(data.user.id);
       const nextStep = registrationResumeStep(record);
-      router.push(nextStep === 0 ? "/dashboard" : `/register?resume=1&step=${nextStep}`);
+      router.push(nextStep === 0 ? "/dashboard?login=1" : `/register?resume=1&step=${nextStep}&login=1`);
     } catch (loadError) {
       console.error("Student registration resume failed:", loadError);
       setError("You are signed in, but your saved record could not be loaded. Please try again or contact the College.");
@@ -41,6 +51,7 @@ export default function StudentLoginPage() {
   }
 
   return <main id="main-content" className="min-h-screen pb-12 text-slate-900">
+    <Toast message={notice} onClose={() => setNotice("")} />
     <InstitutionHeader><Link href="/register" className="button-secondary !min-h-10 !px-3 !py-2 text-xs sm:text-sm">Register</Link></InstitutionHeader>
     <div className="page-wrap-narrow grid min-h-[calc(100vh-6rem)] items-center py-10">
       <section className="surface-card mx-auto w-full max-w-md p-6 sm:p-9">
@@ -51,6 +62,7 @@ export default function StudentLoginPage() {
         <form onSubmit={(event) => void signIn(event)} className="mt-6 space-y-5">
           <label className="block text-sm font-semibold text-slate-700">Email address<input name="email" type="email" autoComplete="username" required className="mt-2 w-full px-4 py-3 text-sm" /></label>
           <label className="block text-sm font-semibold text-slate-700">Password<input name="password" type="password" autoComplete="current-password" required className="mt-2 w-full px-4 py-3 text-sm" /></label>
+          <div className="-mt-2 text-right"><Link href="/login/forgot-password" className="text-sm font-semibold text-teal-800 underline">Forgot password?</Link></div>
           <button disabled={busy} className="button-primary w-full">{busy ? "Signing in…" : "Sign in"}</button>
         </form>
         <p className="mt-5 text-sm text-slate-600">New here? <Link className="font-semibold text-teal-800 underline" href="/register">Create your profile</Link></p>

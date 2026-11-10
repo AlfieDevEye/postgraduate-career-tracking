@@ -29,7 +29,8 @@ export async function getStudentRegistration(studentId: string): Promise<Student
 }
 
 export function registrationResumeStep(record: StudentRegistration): number {
-  if (!record.profile || !record.academic) return 2;
+  if (!record.profile) return 1;
+  if (!record.academic) return 2;
   // Before the explicit preference existed, a completed registration could have no skill rows.
   if (record.employment) return 0;
   if (record.skills.length || record.preference) return 4;

@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { addMonths, isWithinTrackingPeriod } from "@/lib/tracking-schedule.mjs";
+import { escapeHtml } from "@/lib/html-escape.mjs";
 
 export { addMonths } from "@/lib/tracking-schedule.mjs";
 
@@ -25,31 +26,91 @@ export type ReminderSettings = {
 export function serviceClient(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-  return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
-}
 
-export async function requireAdmin(request: Request, db = serviceClient()) {
-  const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  if (!token) return { error: Response.json({ error: "Authentication required" }, { status: 401 }) };
-
-  const { data, error } = await db.auth.getUser(token);
-  if (error || !data.user?.email) return { error: Response.json({ error: "Invalid session" }, { status: 401 }) };
-
-  const { data: admin, error: adminError } = await db
-    .from("admin_users")
-    .select("email,role,is_active")
-    .ilike("email", data.user.email)
-    .eq("is_active", true)
-    .maybeSingle();
-
-  if (adminError) throw new Error(`Could not verify admin access: ${adminError.message}`);
-  if (!admin || !["admin", "super_admin"].includes(String(admin.role).toLowerCase())) {
-    return { error: Response.json({ error: "Administrator access required" }, { status: 403 }) };
+  if (!url || !key) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY"
+    );
   }
 
-  return { adminEmail: admin.email as string, db };
+  return createClient(url, key, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
 }
+
+
+export async function requireAdmin(request: Request, db = serviceClient()) {
+  try {
+    const authHeader = request.headers.get("authorization");
+    const token = authHeader?.match(/^Bearer\s+(.+)$/i)?.[1];
+
+    if (!token) {
+      return {
+        error: Response.json(
+          { error: "Authentication required" },
+          { status: 401 }
+        ),
+      };
+    }
+
+    // Verify the Supabase access token
+    const { data, error } = await db.auth.getUser(token);
+
+    if (error || !data.user) {
+      console.error("Supabase authentication error:", error?.message);
+
+      return {
+        error: Response.json(
+          { error: "Invalid session" },
+          { status: 401 }
+        ),
+      };
+    }
+
+    // Check admin_users using the authenticated user's UUID
+    const { data: admin, error: adminError } = await db
+      .from("admin_users")
+      .select("id, email, full_name, role, is_active")
+      .eq("id", data.user.id)
+      .maybeSingle();
+
+    if (adminError) {
+      console.error("Admin database lookup error:", adminError);
+
+      throw new Error(
+        `Admin database lookup failed: ${adminError.message}`
+      );
+    }
+
+    if (
+      !admin ||
+      !admin.is_active ||
+      !["admin", "super_admin"].includes(
+        String(admin.role).toLowerCase()
+      )
+    ) {
+      return {
+        error: Response.json(
+          { error: "Administrator access required" },
+          { status: 403 }
+        ),
+      };
+    }
+
+    return {
+      adminEmail: admin.email,
+      db,
+    };
+
+  } catch (error) {
+    console.error("requireAdmin failed:", error);
+    throw error;
+  }
+}
+
 
 export function dueDate(tracking: TrackingRow, settings: ReminderSettings): string {
   return tracking.next_update_date ?? addMonths(tracking.last_update_date ?? tracking.tracking_start_date, settings.frequency_months);
@@ -91,7 +152,7 @@ export async function sendReminderEmail(to: string, firstName: string, template:
 
   const renderedBody = renderTemplate(template.body, firstName);
   const body = renderedBody.includes("<")
-    ? { html: renderedBody }
+    ? { html: renderTemplate(template.body, escapeHtml(firstName)) }
     : { text: renderedBody };
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",

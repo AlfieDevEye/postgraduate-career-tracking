@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { MarketingPage } from "@/components/marketing-page";
 import { contact } from "@/lib/site-config";
 export const metadata: Metadata = {
-  title: "Contact | Redeemers University Postgraduate Career Tracking",
+  title: "Contact",
   description: "Contact the Redeemers University College of Postgraduate Studies.",
 };
 export default function ContactPage() {
