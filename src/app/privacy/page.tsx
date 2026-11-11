@@ -23,7 +23,7 @@ export default function PrivacyPage() {
         </section>
         <section>
           <h2 className="text-xl text-[#122b55]">Where it is stored</h2>
-          <p className="mt-3 text-sm leading-7 text-slate-600">Accounts and records are held with Supabase, the site is hosted on Vercel, and emails are sent through an email service provider. Passwords are handled by Supabase Authentication and are never stored in registration drafts. A registration draft is kept in your browser until you submit.</p>
+          <p className="mt-3 text-sm leading-7 text-slate-600">Accounts and records are held with Supabase, the site is hosted on Vercel, and emails are sent through an email service provider. A registration draft is kept in your browser until you submit.</p>
         </section>
         <section>
           <h2 className="text-xl text-[#122b55]">Your choices</h2>

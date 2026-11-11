@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { InstitutionHeader, SiteFooter } from "@/components/institution-header";
 import { supabase } from "@/lib/supabase";
-import { AdminNav } from "@/components/admin-nav";
+import { AdminShell } from "@/components/admin-shell";
 import { Badge, EmptyState, Skeleton, StatCard } from "@/components/dashboard-ui";
 
 type Count = { label: string; count: number };
@@ -41,12 +41,20 @@ export default function DashboardClient() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [denied, setDenied] = useState(false);
+  const requestId = useRef(0);
+  const debounceTimer = useRef<number | null>(null);
+  const initialSearchEffect = useRef(true);
+  const skipDebouncedSearch = useRef(false);
 
   const load = useCallback(async (selected: Filters, selectedPage: number) => {
+    const currentRequestId = ++requestId.current;
     setLoading(true); setError(""); setDenied(false);
     try {
       const { data: auth, error: authError } = await supabase.auth.getSession();
-      if (authError || !auth.session?.access_token) { setDenied(true); setError("Sign in with an active administrator account to view this page."); return; }
+      if (authError || !auth.session?.access_token) {
+        if (currentRequestId === requestId.current) { setDenied(true); setError("Sign in with an active administrator account to view this page."); }
+        return;
+      }
       const params = new URLSearchParams({ page: String(selectedPage) });
       if (selected.q) params.set("q", selected.q);
       if (selected.degree) params.set("degree", selected.degree);
@@ -54,10 +62,18 @@ export default function DashboardClient() {
       if (selected.trackingStatus) params.set("trackingStatus", selected.trackingStatus);
       const response = await fetch(`/api/admin/dashboard?${params}`, { headers: { Authorization: `Bearer ${auth.session.access_token}` }, cache: "no-store" });
       const payload = await response.json() as DashboardData & { error?: string };
-      if (!response.ok) { setDenied(response.status === 401 || response.status === 403); throw new Error(payload.error ?? "Dashboard request failed."); }
+      if (!response.ok) {
+        if (currentRequestId === requestId.current) setDenied(response.status === 401 || response.status === 403);
+        throw new Error(payload.error ?? "Dashboard request failed.");
+      }
+      if (currentRequestId !== requestId.current) return;
       setData(payload);
-    } catch (cause) { setData(null); setError(cause instanceof Error ? cause.message : "Dashboard data could not be loaded."); }
-    finally { setLoading(false); }
+    } catch (cause) {
+      if (currentRequestId === requestId.current) {
+        setData(null);
+        setError(cause instanceof Error ? cause.message : "Dashboard data could not be loaded.");
+      }
+    } finally { if (currentRequestId === requestId.current) setLoading(false); }
   }, []);
 
   useEffect(() => {
@@ -65,11 +81,39 @@ export default function DashboardClient() {
     return () => window.clearTimeout(timer);
   }, [load]);
 
+  useEffect(() => {
+    if (initialSearchEffect.current) {
+      initialSearchEffect.current = false;
+      return;
+    }
+    if (skipDebouncedSearch.current) {
+      skipDebouncedSearch.current = false;
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      debounceTimer.current = null;
+      setPage(1);
+      setApplied(filters);
+      void load(filters, 1);
+    }, 300);
+    debounceTimer.current = timer;
+    return () => {
+      window.clearTimeout(timer);
+      if (debounceTimer.current === timer) debounceTimer.current = null;
+    };
+  }, [filters, load]);
+
   async function search(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setPage(1); setApplied(filters); await load(filters, 1);
+    event.preventDefault();
+    if (debounceTimer.current !== null) window.clearTimeout(debounceTimer.current);
+    debounceTimer.current = null;
+    setPage(1); setApplied(filters); await load(filters, 1);
   }
 
   async function clearFilters() {
+    if (debounceTimer.current !== null) window.clearTimeout(debounceTimer.current);
+    debounceTimer.current = null;
+    if (filters !== emptyFilters) skipDebouncedSearch.current = true;
     setFilters(emptyFilters); setApplied(emptyFilters); setPage(1); await load(emptyFilters, 1);
   }
 
@@ -92,8 +136,8 @@ export default function DashboardClient() {
         <button type="button" disabled={busy} onClick={() => void signOut()} className="button-secondary !min-h-10 !px-3 !py-2 text-xs sm:text-sm">Sign out</button>
       </nav>
     </InstitutionHeader>
-    <AdminNav active="dashboard" />
     <div className="page-wrap py-8 sm:py-11">
+      <AdminShell>
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="section-kicker">Administrator workspace</p><h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Career tracking overview</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Live summaries and student search from the records currently available to the platform.</p></div><Link href="/admin/reminders" className="button-primary">Manage reminders <span aria-hidden="true">→</span></Link></div>
       {error && <div role="alert" className="status-panel mt-6" data-tone="error"><strong>{denied ? "Access denied" : "Dashboard unavailable"}.</strong> {error}</div>}
       {loading && !data && <div role="status" aria-label="Loading verified dashboard data" className="mt-6 space-y-5">
@@ -141,6 +185,7 @@ export default function DashboardClient() {
         </section>
         <p className="mt-4 text-xs leading-5 text-slate-500">Registration date trends, faculty/department charts, skill analytics, completed tracking totals, and student detail views are omitted until their live schema, data semantics, and access policies can be verified.</p>
       </>}
+      </AdminShell>
     </div>
     <SiteFooter />
   </main>;

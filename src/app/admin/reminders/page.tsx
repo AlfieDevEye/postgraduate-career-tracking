@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { InstitutionHeader, SiteFooter } from "@/components/institution-header";
 import { supabase } from "@/lib/supabase";
-import { AdminNav } from "@/components/admin-nav";
+import { AdminShell } from "@/components/admin-shell";
 
 type RecordRow = {
   id: string;
@@ -77,8 +77,8 @@ export default function AdminRemindersPage() {
 
   return <main id="main-content" className="min-h-screen pb-12 text-slate-900">
     <InstitutionHeader><Link href="/admin" className="button-secondary !min-h-10 !px-3 !py-2 text-xs sm:text-sm">Dashboard</Link></InstitutionHeader>
-    <AdminNav active="reminders" />
     <div className="page-wrap py-9 sm:py-12">
+      <AdminShell>
       <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div><p className="section-kicker">Administrator workspace</p><h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Employment reminders</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Control update intervals and test one selected tracking record. Server routes verify your active administrator account for every action.</p></div>
         <span className="eyebrow-pill !normal-case !tracking-normal">Five-year tracking period</span>
@@ -101,6 +101,7 @@ export default function AdminRemindersPage() {
         <button type="button" disabled={busy || !trackingId || loadingRecords} onClick={() => void run("send")} className="button-primary mt-5 !border-teal-800 !bg-teal-700">{busy ? "Working…" : "Send test email"}</button>
       </section>
       {result && <div className="status-panel mt-5" data-tone="success"><pre role="status" className="overflow-auto whitespace-pre-wrap break-words text-xs leading-5">{JSON.stringify(result, null, 2)}</pre></div>}
+      </AdminShell>
     </div>
     <SiteFooter />
   </main>;

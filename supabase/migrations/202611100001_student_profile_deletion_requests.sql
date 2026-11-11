@@ -14,12 +14,19 @@ create unique index if not exists student_profile_deletion_requests_one_pending_
 alter table public.student_profile_deletion_requests enable row level security;
 grant select, insert on public.student_profile_deletion_requests to authenticated;
 
+drop policy if exists "Students can view their own profile deletion requests" on public.student_profile_deletion_requests;
 create policy "Students can view their own profile deletion requests"
   on public.student_profile_deletion_requests
   for select to authenticated
   using (auth.uid() = student_id);
 
+drop policy if exists "Students can submit their own profile deletion requests" on public.student_profile_deletion_requests;
 create policy "Students can submit their own profile deletion requests"
   on public.student_profile_deletion_requests
   for insert to authenticated
-  with check (auth.uid() = student_id);
+  with check (
+    auth.uid() = student_id
+    and status = 'pending'
+    and reviewed_at is null
+    and lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+  );

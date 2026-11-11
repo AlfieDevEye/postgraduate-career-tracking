@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { AdminNav } from "@/components/admin-nav";
+import { AdminShell } from "@/components/admin-shell";
 import { Badge, EmptyState, Skeleton } from "@/components/dashboard-ui";
 import { InstitutionHeader, SiteFooter } from "@/components/institution-header";
 import { Toast } from "@/components/toast";
@@ -152,8 +152,9 @@ export default function AdminJobsPage() {
 
   return <main id="main-content" className="min-h-screen pb-12 text-slate-900">
     <InstitutionHeader><Link href="/admin" className="button-secondary !min-h-10 !px-3 !py-2 text-xs sm:text-sm">Dashboard</Link></InstitutionHeader>
-    <AdminNav active="jobs" />
-    <div className="page-wrap space-y-5 py-9 sm:py-12">
+    <div className="page-wrap py-9 sm:py-12">
+      <AdminShell>
+      <div className="space-y-5">
       <header>
         <p className="section-kicker">Administrator workspace</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Job opportunities</h1>
@@ -228,6 +229,8 @@ export default function AdminJobsPage() {
           })}
         </ul>}
       </section>
+      </div>
+      </AdminShell>
     </div>
     <Toast message={toast} onClose={() => setToast("")} />
     <SiteFooter />
