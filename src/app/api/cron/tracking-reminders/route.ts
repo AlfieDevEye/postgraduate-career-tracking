@@ -55,8 +55,8 @@ export async function POST(request: Request) {
       if (prior?.length) { skipped++; continue; }
 
       const { data: profile, error: profileError } = await db.from("student_profiles")
-        .select("first_name,email")
-        .eq("student_id", tracking.student_id)
+        .select("id,first_name,email")
+        .eq("id", tracking.student_id)
         .maybeSingle();
       if (profileError || !profile?.email) { failures.push({ trackingId: tracking.id, error: profileError?.message ?? "Student email is missing" }); continue; }
 

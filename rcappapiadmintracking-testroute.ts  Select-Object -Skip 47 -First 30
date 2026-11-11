@@ -1,0 +1,19 @@
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m39[m[36m-[m    const testMode = mode as "simulate" | "send";
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m40[m[36m-[m
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m41[m[36m-[m    const { data: tracking, error } = await access.db.from("student_tracking")
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m42[m[36m-[m      .select("id,student_id,tracking_start_date,tracking_end_date,last_update_date,next_update_date,is_active,last_email_sent_at")
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m43[m[36m-[m      .eq("id", trackingId)
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m44[m[36m-[m      .maybeSingle();
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m45[m[36m-[m    if (error) throw new Error(`Could not load tracking record: ${error.message}`);
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m46[m[36m-[m    if (!tracking || !isTrackable(tracking as TrackingRow)) return NextResponse.json({ error: "This tracking record is missing, inactive, or expired." }, { status: 404 });
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m47[m[36m-[m
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m48[m[36m-[m    const { data: profile, error: profileError } = await access.db.from("student_profiles")
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m49[m[36m-[m      .select("student_id,first_name,last_name,email").eq("student_id", tracking.student_id).maybeSingle();
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m50[m[36m-[m    if (profileError) throw new Error(`Could not load student profile: ${profileError.message}`);
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m:[m[32m51[m[36m:[m    if (!profile?.email) return NextResponse.json({ error: "Selected student [1;31mhas no email[m address." }, { status: 422 });
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m52[m[36m-[m
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m53[m[36m-[m    const scheduleBase = tracking.last_update_date ?? tracking.tracking_start_date;
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m54[m[36m-[m    const nextDueDate = addMonths(scheduleBase, Number(frequencyMonths));
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m55[m[36m-[m    const template = await getReminderTemplate(access.db);
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m56[m[36m-[m    if (testMode === "simulate") {
+[35msrc/app/api/admin/tracking-test/route.ts[m[36m-[m[32m57[m[36m-[m      const audit = await logTestRun(access.db, { adminEmail, studentId: tracking.student_id, trackingId, frequencyMonths: Number(frequencyMonths), mode: testMode, result: "simulated" });

@@ -14,10 +14,10 @@ export async function GET(request: Request) {
     if (error) throw new Error(`Could not load active tracking records: ${error.message}`);
     const studentIds = [...new Set((data ?? []).map((row) => row.student_id))];
     const { data: profiles, error: profilesError } = studentIds.length
-      ? await access.db.from("student_profiles").select("student_id,first_name,last_name,email").in("student_id", studentIds)
+      ? await access.db.from("student_profiles").select("id,student_id,first_name,last_name,email").in("id", studentIds)
       : { data: [], error: null };
     if (profilesError) throw new Error(`Could not load student labels: ${profilesError.message}`);
-    const profileMap = new Map((profiles ?? []).map((profile) => [profile.student_id, profile]));
+    const profileMap = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
     return NextResponse.json({ records: (data ?? []).map((row) => ({ ...row, student: profileMap.get(row.student_id) ?? null })) });
   } catch (error) {
     console.error("Admin tracking test list failed:", error);
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     if (!tracking || !isTrackable(tracking as TrackingRow)) return NextResponse.json({ error: "This tracking record is missing, inactive, or expired." }, { status: 404 });
 
     const { data: profile, error: profileError } = await access.db.from("student_profiles")
-      .select("student_id,first_name,last_name,email").eq("student_id", tracking.student_id).maybeSingle();
+      .select("id,student_id,first_name,last_name,email").eq("id", tracking.student_id).maybeSingle();
     if (profileError) throw new Error(`Could not load student profile: ${profileError.message}`);
     if (!profile?.email) return NextResponse.json({ error: "Selected student has no email address." }, { status: 422 });
 

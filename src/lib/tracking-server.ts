@@ -122,8 +122,8 @@ export function isTrackable(tracking: TrackingRow, now = new Date()): boolean {
 
 export function defaultTemplate() {
   return {
-    subject: "Please update your postgraduate employment information",
-    body: "Dear {{first_name}},\n\nPlease take a moment to confirm or update your employment information with Redeemers University College of Postgraduate Studies.\n\nThank you,\nCollege of Postgraduate Studies",
+    subject: "A quick check-in from the College of Postgraduate Studies",
+    body: "Hello {{first_name}},\n\nThis is a short check-in from the College of Postgraduate Studies, Redeemers University. We hope you are doing well in your studies and career.\n\nThere is nothing you need to do, and no reply is needed. If your employment or contact details have changed, you can update them at any time by signing in to your student account.\n\nWe will check in again in a few months. Thank you for staying connected with the College.\n\nWarm regards,\nCollege of Postgraduate Studies\nRedeemers University",
   };
 }
 
@@ -142,7 +142,7 @@ export async function getReminderTemplate(db: SupabaseClient) {
 }
 
 export function renderTemplate(value: string, firstName: string) {
-  return value.replace(/{{\s*first_name\s*}}/gi, firstName || "Graduate");
+  return value.replace(/{{\s*first_name\s*}}/gi, firstName);
 }
 
 export async function sendReminderEmail(to: string, firstName: string, template: { subject: string; body: string }) {
@@ -150,10 +150,19 @@ export async function sendReminderEmail(to: string, firstName: string, template:
   const from = process.env.RESEND_FROM_EMAIL;
   if (!apiKey || !from) return { sent: false as const, reason: "Email delivery is not configured (RESEND_API_KEY and RESEND_FROM_EMAIL are required)." };
 
-  const renderedBody = renderTemplate(template.body, firstName);
+  const renderedBody = renderTemplate(template.body, firstName).replace(/^Hello ,/m, "Hello,");
+  const htmlRenderedBody = renderTemplate(template.body, escapeHtml(firstName)).replace(/^Hello ,/m, "Hello,");
   const body = renderedBody.includes("<")
-    ? { html: renderTemplate(template.body, escapeHtml(firstName)) }
-    : { text: renderedBody };
+    ? {
+      html: htmlRenderedBody,
+      text: renderedBody.replace(/<[^>]*>/g, ""),
+    }
+    : {
+      html: htmlRenderedBody.split(/\n\n+/).map((paragraph) =>
+        `<p style="font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #1f2937; max-width: 560px;">${paragraph.split("\n").join("<br>")}</p>`,
+      ).join(""),
+      text: renderedBody,
+    };
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
